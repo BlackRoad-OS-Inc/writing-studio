@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest pytest-cov
+      - name: Run tests
+        run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
+      - name: Smoke-test CLI
+        run: |
+          python src/typography_analyzer.py readability "The quick brown fox jumps." --size 16 --lh 1.5
+          python src/typography_analyzer.py scale --base 1.0 --ratio 1.25 --css
+          python src/typography_analyzer.py contrast '#1e293b' '#f8fafc'
