@@ -145,13 +145,43 @@ def test_relative_luminance_white():
 def test_relative_luminance_black():
     assert abs(relative_luminance("#000000")) < 0.001
 
+def test_relative_luminance_shorthand():
+    # #fff should expand to #ffffff
+    assert abs(relative_luminance("#fff") - 1.0) < 0.001
+
+def test_relative_luminance_invalid_raises():
+    with pytest.raises(ValueError):
+        relative_luminance("#xyz123")
+
+def test_relative_luminance_nonhex_chars():
+    with pytest.raises(ValueError):
+        relative_luminance("#gggggg")
+
+def test_relative_luminance_wrong_length():
+    with pytest.raises(ValueError):
+        relative_luminance("#12345")
+
+
+# ── Font category validation ──────────────────────────────────────────────────
+def test_font_invalid_category_raises():
+    with pytest.raises(ValueError):
+        make_font(category="invalid-category")
+
+
+# ── URL encoding in google_url ────────────────────────────────────────────────
+def test_google_url_text_encoded():
+    f = make_font()
+    url = f.google_url(text="hello world & more")
+    assert " " not in url
+    assert "&text=" in url
+    assert "hello%20world" in url
 
 # ── Font dataclass ────────────────────────────────────────────────────────────
 def make_font(**kw) -> Font:
     defaults = dict(
         id=str(uuid.uuid4()), name="Inter", category="sans-serif",
         weights=[400, 700], google_font_id="Inter",
-        tags=["modern"], created_at=datetime.datetime.utcnow().isoformat(),
+        tags=["modern"], created_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
     )
     defaults.update(kw)
     return Font(**defaults)
