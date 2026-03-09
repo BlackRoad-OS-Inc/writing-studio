@@ -15,6 +15,7 @@ import sys
 import uuid
 import argparse
 import datetime
+import urllib.parse
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple
@@ -54,12 +55,18 @@ class Font:
     tags: List[str] = field(default_factory=list)
     created_at: str = ""
 
+    def __post_init__(self) -> None:
+        if self.category not in CATEGORIES:
+            raise ValueError(
+                f"Invalid category {self.category!r}; must be one of {CATEGORIES}"
+            )
+
     def google_url(self, text: str = "") -> str:
         family = self.google_font_id or self.name.replace(" ", "+")
         wt = ":wght@" + ";".join(str(w) for w in sorted(self.weights))
         url = GOOGLE_FONTS_BASE.format(family + wt)
         if text:
-            url += f"&text={text[:50]}"
+            url += "&text=" + urllib.parse.quote(text[:50])
         return url
 
     def css_import(self) -> str:
@@ -292,7 +299,14 @@ def _linearize_channel(c: int) -> float:
 
 def relative_luminance(hex_color: str) -> float:
     h = hex_color.lstrip("#")
-    r = int(h[0:2], 16); g = int(h[2:4], 16); b = int(h[4:6], 16)
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)   # expand #rgb → #rrggbb
+    if len(h) != 6:
+        raise ValueError(f"Invalid hex color: {hex_color!r}")
+    try:
+        r = int(h[0:2], 16); g = int(h[2:4], 16); b = int(h[4:6], 16)
+    except ValueError:
+        raise ValueError(f"Invalid hex color: {hex_color!r}")
     return (0.2126 * _linearize_channel(r) +
             0.7152 * _linearize_channel(g) +
             0.0722 * _linearize_channel(b))
@@ -357,28 +371,29 @@ def suggest_pairing(font: Font, db_path: Path = DB_PATH) -> dict:
     """Suggest complementary fonts for a given font, using DB first then defaults."""
     rules = _PAIRING_RULES.get(font.category, [])
     suggestions = []
-    for rule in rules:
-        target_cat = rule["category"]
-        # Try DB first
-        conn = _db(db_path)
-        row = conn.execute(
-            "SELECT id,name,category FROM fonts WHERE category=? AND id!=? LIMIT 1",
-            (target_cat, font.id),
-        ).fetchone()
-        conn.close()
+    conn = _db(db_path)
+    try:
+        for rule in rules:
+            target_cat = rule["category"]
+            row = conn.execute(
+                "SELECT id,name,category FROM fonts WHERE category=? AND id!=? LIMIT 1",
+                (target_cat, font.id),
+            ).fetchone()
 
-        if row:
-            suggestions.append({
-                "font_id": row[0], "name": row[1], "category": row[2],
-                "reason": rule["reason"], "source": "database",
-            })
-        else:
-            defaults = _DEFAULTS.get(target_cat, [])
-            if defaults:
+            if row:
                 suggestions.append({
-                    "font_id": None, "name": defaults[0], "category": target_cat,
-                    "reason": rule["reason"], "source": "built-in",
+                    "font_id": row[0], "name": row[1], "category": row[2],
+                    "reason": rule["reason"], "source": "database",
                 })
+            else:
+                defaults = _DEFAULTS.get(target_cat, [])
+                if defaults:
+                    suggestions.append({
+                        "font_id": None, "name": defaults[0], "category": target_cat,
+                        "reason": rule["reason"], "source": "built-in",
+                    })
+    finally:
+        conn.close()
 
     return {
         "base_font": {"id": font.id, "name": font.name, "category": font.category},
@@ -441,7 +456,7 @@ def save_font(font: Font, db_path: Path = DB_PATH) -> None:
          ",".join(str(w) for w in font.weights),
          font.google_font_id,
          ",".join(font.tags),
-         font.created_at or datetime.datetime.utcnow().isoformat()),
+         font.created_at or datetime.datetime.now(datetime.timezone.utc).isoformat()),
     )
     conn.commit(); conn.close()
 
@@ -578,7 +593,7 @@ examples:
             weights=[int(w.strip()) for w in args.weights.split(",") if w.strip()],
             google_font_id=args.google_font_id,
             tags=[t.strip() for t in args.tags.split(",") if t.strip()],
-            created_at=datetime.datetime.utcnow().isoformat(),
+            created_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         )
         save_font(font)
         print(f"✅ added font '{font.name}' → {font.id}")
