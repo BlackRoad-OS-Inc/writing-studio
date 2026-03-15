@@ -1,53 +1,41 @@
-# ✍️ Writing Studio — Typography Analyzer
+<div align="center">
 
-Part of **BlackRoad Studio** — production creative tools.
+<img src="https://images.blackroad.io/pixel-art/road-logo.png" alt="BlackRoad OS" width="80" />
 
-Analyze readability, generate type scales, check WCAG contrast, and suggest font pairings — pure Python, zero dependencies.
+# writing-studio
 
-## Features
+**Writing Studio - Content creation platform with AI-powered writing assistance, grammar, style, and research tools.**
 
-- **Flesch Reading Ease** — sentence/syllable analysis, grade level scoring
-- **Type scale generator** — modular scale with any ratio (golden ratio default: 1.618)
-- **WCAG contrast checker** — AA / AAA grades for fg/bg pairs
-- **Line-height recommendations** — WCAG 1.4.12 compliance
-- **Measure (line-length) checker** — 45–75 character sweet-spot
-- **Font pairing suggestions** — rule-based category contrast
-- **CSS / Tailwind exports** — `@import`, `font-family`, CSS vars
-- **SQLite font library** — save, query, delete fonts
+[![BlackRoad OS](https://img.shields.io/badge/BlackRoad_OS-Pave_Tomorrow-FF2255?style=for-the-badge&labelColor=000000)](https://blackroad.io)
+[![License](https://img.shields.io/badge/License-Proprietary-FF6B2B?style=for-the-badge&labelColor=000000)](./LICENSE)
+[![Edge AI](https://img.shields.io/badge/Edge_AI-52_TOPS-00D4FF?style=for-the-badge&labelColor=000000)](https://github.com/BlackRoad-OS-Inc)
 
-## Quick start
+</div>
 
-```bash
-# Analyze text readability
-python src/typography_analyzer.py readability "Your text here" --size 16 --lh 1.6
+<div align="center">
+<sub>Part of the <a href="https://blackroad.io">BlackRoad OS</a> ecosystem — sovereign edge AI infrastructure</sub>
+</div>
 
-# Generate type scale (golden ratio)
-python src/typography_analyzer.py scale --base 1.0 --ratio 1.618 --css
+---
 
-# Check WCAG contrast
-python src/typography_analyzer.py contrast '#1e293b' '#f8fafc'
+## Overview
 
-# Add a font
-python src/typography_analyzer.py add-font "Inter" sans-serif --weights 400,600,700 --gid Inter
+Writing Studio - Content creation platform with AI-powered writing assistance, grammar, style, and research tools.
 
-# Suggest pairings
-python src/typography_analyzer.py pair <font-id>
-```
+## License
 
-## Common ratios
+**Proprietary** — Copyright © 2024–2026 [BlackRoad OS, Inc.](https://blackroad.io) All rights reserved.
 
-| Name | Ratio | Effect |
-|---|---|---|
-| Minor Second | 1.067 | Subtle scale |
-| Major Second | 1.125 | Gentle |
-| Minor Third | 1.2 | Comfortable |
-| Major Third | 1.25 | Clear hierarchy |
-| Perfect Fourth | 1.333 | Traditional |
-| Golden Ratio | **1.618** | Harmonious |
+Founder & CEO: **Alexa Louise Amundson** · Delaware C-Corp
 
-## Tests
+See [LICENSE](./LICENSE) for full terms.
 
-```bash
-pip install pytest pytest-cov
-pytest tests/ -v --cov=src
-```
+---
+
+<div align="center">
+
+**BlackRoad OS — Pave Tomorrow.**
+
+[blackroad.io](https://blackroad.io) · [GitHub](https://github.com/BlackRoad-OS-Inc) · [Brand](https://brand.blackroad.io)
+
+</div>
