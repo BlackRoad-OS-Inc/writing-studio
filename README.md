@@ -1,5 +1,13 @@
 # writing-studio
 
+> Writing Studio — AI-powered content creation platform with grammar, style, and research tools (BlackRoad integration)
+
+Part of the [BlackRoad OS](https://blackroad.io) ecosystem — [BlackRoad-OS-Inc](https://github.com/BlackRoad-OS-Inc)
+
+---
+
+# writing-studio
+
 Writing Studio — AI-powered content creation platform with grammar, style, and research tools (BlackRoad integration)
 
 **BlackRoad-OS-Inc** — Corporate root — all IP and governance
